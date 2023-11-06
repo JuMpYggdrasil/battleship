@@ -1,5 +1,11 @@
 import tkinter as tk
 
+def toggle_bold(cell):
+    if cell.cget("font") == "":
+        cell.config(font=("default", 12, "bold"))
+    else:
+        cell.config(font="default")
+
 # Define the size of the Battleship grid
 grid_size = 10
 
@@ -63,8 +69,10 @@ def calculate_probability():
 def on_grid_click(row, col):
     if grid[row][col] == 0:
         grid[row][col] = -1  # Mark as missed
-        probabilities = calculate_probability()  # Recalculate probabilities
-        display_grid(probabilities)  # Display updated grid with probabilities
+    elif grid[row][col] == -1:
+        grid[row][col] = 0  # Unmark
+    probabilities = calculate_probability()  # Recalculate probabilities
+    display_grid(probabilities)  # Display updated grid with probabilities
 
 # Function to display the grid with probability values and red background for missed squares
 def display_grid(probabilities):
@@ -74,10 +82,13 @@ def display_grid(probabilities):
     for row in range(grid_size):
         for col in range(grid_size):
             prob = probabilities[row][col]
+            text = f'{prob:.2f}'
+            text_color = 'blue' if (row + col) % 2 == 0 else 'black'  # Set text color based on the chessboard pattern
+
             if grid[row][col] == -1:
-                label = tk.Label(grid_frame, text=f'{prob:.2f}', width=6, height=1, relief=tk.RAISED, bg='red')
+                label = tk.Label(grid_frame, text=text, width=6, height=1, relief=tk.RAISED, bg='red', fg=text_color)
             else:
-                label = tk.Label(grid_frame, text=f'{prob:.2f}', width=6, height=1, relief=tk.RAISED)
+                label = tk.Label(grid_frame, text=text, width=6, height=1, relief=tk.RAISED, fg=text_color)
             label.grid(row=row, column=col)
             label.bind("<Button-1>", lambda event, r=row, c=col: on_grid_click(r, c))
 
